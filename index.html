@@ -84,7 +84,7 @@ const pass=(c,k,skip)=>k===skip||st.f[k].size===0||st.f[k].has(KEY[k](c));
 const match=(c,k,skip)=>Object.keys(st.f).every(x=>pass(c,x,skip))&&(!st.q||IDX[k].includes(st.q));
 const pool=()=>DECK.filter((c,k)=>match(c,k));
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
-function build(){st.order=shuffle(pool().map(c=>c.n));st.i=0;st.shown=false;controls();render()}
+function build(){const o=pool().map(c=>c.n);st.order=st.shuf?shuffle(o):o;st.i=0;st.shown=false;controls();render()}
 let openDD=null;
 function controls(){const box=$('dds');box.innerHTML='';
  DEFS.forEach(d=>{const set=st.f[d.k];const w=document.createElement('div');w.className='dd'+(openDD===d.k?' open':'');
@@ -124,7 +124,7 @@ const go=d=>{if(!st.order.length)return;st.i=(st.i+d+st.order.length)%st.order.l
 const mark=v=>{if(!st.order.length)return;st.seen[DECK[st.order[st.i]-1].id]=v;save();go(1)};
 $('flip').onclick=()=>{st.shown=!st.shown;render()};$('next').onclick=()=>go(1);$('prev').onclick=()=>go(-1);
 $('ok').onclick=()=>mark('ok');$('ko').onclick=()=>mark('ko');
-$('shuf').onclick=()=>{shuffle(st.order);st.i=0;st.shown=false;render()};
+$('shuf').onclick=()=>{st.shuf=!st.shuf;$('shuf').classList.toggle('on',st.shuf);$('shuf').textContent=st.shuf?'Shuffle: on':'Shuffle';const o=pool().map(c=>c.n);st.order=st.shuf?shuffle(o):o;st.i=0;st.shown=false;render()};
 $('reset').onclick=()=>{const b=$('reset');if(!st.resetArm){st.resetArm=true;b.textContent='Click again to confirm';setTimeout(()=>{st.resetArm=false;b.textContent='Reset progress'},3000);return}
  st.seen={};save();st.resetArm=false;b.textContent='Reset progress';render()};
 let tm;$('search').oninput=e=>{clearTimeout(tm);tm=setTimeout(()=>{st.q=e.target.value.trim().toLowerCase();build()},200)};
